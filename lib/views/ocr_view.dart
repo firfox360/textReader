@@ -4,7 +4,6 @@ import '../controllers/ocr_controller.dart';
 import '../config/app_config.dart';
 import '../config/app_theme.dart';
 import '../widgets/custom_widgets.dart';
-import 'widgets/results_dialog.dart';
 
 /// Main OCR Scanner View - Production level MVC
 class OcrView extends GetView<OcrController> {
@@ -43,7 +42,7 @@ class OcrView extends GetView<OcrController> {
                       ),
                       child: SuccessMessage(
                         message:
-                            'Successfully extracted ${controller.appState.extractedData.value.getFieldCount()} fields',
+                            'Successfully extracted ${controller.extractionResult.value.data.length} fields',
                       ),
                     ),
 
@@ -52,7 +51,7 @@ class OcrView extends GetView<OcrController> {
                   const SizedBox(height: AppConfig.defaultPadding * 1.5),
 
                   // Extracted data form section
-                  if (controller.appState.extractedData.value.hasData())
+                  if (controller.extractionResult.value.data.isNotEmpty)
                     _buildFormSection(),
                   const SizedBox(height: AppConfig.defaultPadding),
                 ],
@@ -82,7 +81,7 @@ class OcrView extends GetView<OcrController> {
         Obx(
           () => IconButton(
             icon: const Icon(Icons.delete_outline),
-            onPressed: controller.appState.extractedData.value.hasData()
+            onPressed: controller.extractionResult.value.data.isNotEmpty
                 ? controller.clearAll
                 : null,
             tooltip: 'Clear all data',
@@ -152,11 +151,11 @@ class OcrView extends GetView<OcrController> {
             );
           }
 
-          final extractedData = controller.dynamicExtractedData.value;
+          final extractedData = controller.extractionResult.value.data;
           
           return Column(
             children: fields.map((field) {
-              final value = extractedData.getField(field.id) ?? '';
+              final value = extractedData[field.id] ?? '';
               
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:convert';
 import '../../controllers/ocr_controller.dart';
 import '../../config/app_config.dart';
 import '../../config/app_theme.dart';
@@ -116,7 +117,7 @@ class ResultsDialog extends StatelessWidget {
   }
 
   Widget _buildSummarySection() {
-    final data = controller.dynamicExtractedData.value;
+    final result = controller.extractionResult.value;
     return _buildSection(
       'Summary',
       Colors.blue[50]!,
@@ -124,17 +125,17 @@ class ResultsDialog extends StatelessWidget {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoRow('Fields Found:', data.getFieldCount().toString()),
-          _buildInfoRow('Data Complete:', data.hasData() ? '✓ Yes' : '✗ No'),
-          _buildInfoRow('Extracted At:', data.extractedAt.toString()),
+          _buildInfoRow('Fields Found:', result.data.length.toString()),
+          _buildInfoRow('Extraction Success:', result.success ? '✓ Yes' : '✗ No'),
+          _buildInfoRow('Extracted At:', result.extractedAt.toString()),
         ],
       ),
     );
   }
 
   Widget _buildExtractedFieldsSection() {
-    final data = controller.dynamicExtractedData.value;
-    final allFields = data.getAllFields();
+    final result = controller.extractionResult.value;
+    final data = result.data;
     
     return _buildSection(
       'Extracted Fields',
@@ -143,13 +144,13 @@ class ResultsDialog extends StatelessWidget {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (allFields.isEmpty)
+          if (data.isEmpty)
             const Text(
               'No fields extracted',
               style: TextStyle(color: Colors.grey),
             )
           else
-            ...allFields.entries.map((entry) => 
+            ...data.entries.map((entry) => 
               _buildFieldRow('${entry.key}:', entry.value?.toString() ?? 'N/A')
             ),
         ],
@@ -158,7 +159,8 @@ class ResultsDialog extends StatelessWidget {
   }
 
   Widget _buildJsonSection() {
-    final jsonString = controller.dynamicExtractedData.value.toJsonString();
+    final result = controller.extractionResult.value;
+    final jsonString = jsonEncode(result.data);
     return _buildSection(
       'JSON Output',
       Colors.purple[50]!,

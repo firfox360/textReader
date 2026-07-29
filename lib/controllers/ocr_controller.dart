@@ -3,22 +3,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
 import '../models/app_state.dart';
 import '../services/camera_service.dart';
-import '../services/dynamic_field_service.dart';
+import '../textreder.dart';
 
-/// Main OCR Scanner Controller - Dynamic field extraction
+/// Main OCR Scanner Controller - Uses Textreder Package
 class OcrController extends GetxController {
   // Services
   final CameraService _cameraService = CameraService();
-  final DynamicFieldService _dynamicFieldService = DynamicFieldService();
+  final TextrederService _textrederService = TextrederService(
+    configPath: 'assets/field_config.json',
+  );
 
   // State
   late AppState appState;
 
-  // Dynamic extracted data (flexible, changes based on field_config.json)
-  final Rx<DynamicExtractedData> dynamicExtractedData = 
-      Rx<DynamicExtractedData>(DynamicExtractedData());
+  // Extracted data result from Textreder package
+  final Rx<ExtractionResult> extractionResult = Rx<ExtractionResult>(
+    ExtractionResult(
+      data: {},
+      rawText: '',
+      extractedAt: DateTime.now(),
+      success: false,
+    ),
+  );
 
   // Form controllers map - user creates these in their UI based on their needs
   final Map<String, TextEditingController> formControllers = {};
@@ -28,19 +37,19 @@ class OcrController extends GetxController {
     super.onInit();
     appState = AppState();
     _cameraService.initialize();
-    _initializeDynamicFields();
+    _initializeTextreder();
   }
 
-  /// Initialize dynamic fields from config
-  Future<void> _initializeDynamicFields() async {
+  /// Initialize Textreder service
+  Future<void> _initializeTextreder() async {
     try {
-      await _dynamicFieldService.initialize();
+      await _textrederService.initialize();
       
       if (kDebugMode) {
-        print(_dynamicFieldService.getDebugInfo());
+        debugPrint(_textrederService.getDebugInfo());
       }
     } catch (e) {
-      appState.setError('Failed to load field configuration: $e');
+      appState.setError('Failed to initialize Textreder: $e');
     }
   }
 
@@ -96,34 +105,28 @@ class OcrController extends GetxController {
     }
   }
 
-  /// Process image with OCR and extract data dynamically
+  /// Process image with OCR and extract data using Textreder
   Future<void> _processImage(XFile imageFile) async {
     try {
       appState.setLoading(true);
 
-      // Recognize text from image
-      final rawText = await _cameraService.recognizeText(imageFile);
-      appState.setRawText(rawText);
+      // Use Textreder package to process image and extract data
+      // Returns ExtractionResult with Map<String, dynamic> containing field IDs as keys
+      final result = await _textrederService.processImage(imageFile);
+      
+      extractionResult.value = result;
+      appState.setRawText(result.rawText);
 
-      if (rawText.isEmpty) {
-        appState.setError('No text detected in image');
-        appState.setLoading(false);
-        return;
+      if (result.success) {
+        if (result.data.isEmpty) {
+          appState.setError('No data extracted from image');
+        } else {
+          appState.setSuccess(true);
+          _printDebugInfo(result);
+        }
+      } else {
+        appState.setError('Extraction failed: ${result.errors.join(', ')}');
       }
-
-      // Extract data dynamically based on field_config.json
-      final extractedFields = _dynamicFieldService.extractAllFields(rawText);
-      
-      // Create dynamic extracted data
-      final extractedData = DynamicExtractedData.fromExtractedFields(
-        extractedFields,
-        rawText: rawText,
-      );
-      
-      dynamicExtractedData.value = extractedData;
-      appState.setSuccess(true);
-      
-      _printDebugInfo(rawText, extractedData);
     } catch (e) {
       appState.setError('Error processing image: $e');
     } finally {
@@ -137,7 +140,7 @@ class OcrController extends GetxController {
     for (final fieldId in fieldIds) {
       final controller = formControllers[fieldId];
       if (controller != null) {
-        final value = dynamicExtractedData.value.getField(fieldId);
+        final value = extractionResult.value.data[fieldId];
         if (value != null) {
           controller.text = value.toString();
         }
@@ -147,12 +150,12 @@ class OcrController extends GetxController {
 
   /// Get extracted value for a specific field
   dynamic getFieldValue(String fieldId) {
-    return dynamicExtractedData.value.getField(fieldId);
+    return extractionResult.value.data[fieldId];
   }
 
   /// Update a field value
   void updateFieldValue(String fieldId, dynamic value) {
-    dynamicExtractedData.value.setField(fieldId, value);
+    extractionResult.value.data[fieldId] = value;
     
     // Update form controller if it exists
     final controller = formControllers[fieldId];
@@ -163,26 +166,31 @@ class OcrController extends GetxController {
 
   /// Get all extracted data as JSON
   String getExtractedJsonString() {
-    return dynamicExtractedData.value.toJsonString();
+    return jsonEncode(extractionResult.value.data);
   }
 
   /// Get all extracted data as Map
   Map<String, dynamic> getExtractedDataMap() {
-    return dynamicExtractedData.value.getAllFields();
+    return extractionResult.value.data;
   }
 
   /// Clear all data
   void clearAll() {
     appState.reset();
-    dynamicExtractedData.value.clear();
+    extractionResult.value = ExtractionResult(
+      data: {},
+      rawText: '',
+      extractedAt: DateTime.now(),
+      success: false,
+    );
     for (final controller in formControllers.values) {
       controller.clear();
     }
   }
 
   /// Get field configuration (for UI building)
-  List<DynamicFieldConfig> getAvailableFields() {
-    return _dynamicFieldService.getAllFields();
+  List<FieldConfig> getAvailableFields() {
+    return _textrederService.getFieldConfigs();
   }
 
   /// Copy extracted JSON to clipboard
@@ -206,19 +214,9 @@ class OcrController extends GetxController {
   }
 
   /// Private helper for debug logging
-  void _printDebugInfo(String rawText, DynamicExtractedData data) {
+  void _printDebugInfo(ExtractionResult result) {
     if (kDebugMode) {
-      debugPrint(
-        '\n════════════════════════════════════════════════════════════════════════════\n'
-        '📸 OCR PROCESSING COMPLETE (DYNAMIC EXTRACTION)\n'
-        '════════════════════════════════════════════════════════════════════════════\n'
-        'RAW TEXT:\n$rawText\n\n'
-        'EXTRACTED DATA:\n'
-        '${data.getAllFields().entries.map((e) => '  ${e.key}: ${e.value}').join('\n')}\n\n'
-        'FIELD COUNT: ${data.getFieldCount()}\n\n'
-        'JSON OUTPUT:\n${data.toJsonString()}\n'
-        '════════════════════════════════════════════════════════════════════════════\n'
-      );
+      debugPrint(result.prettyPrint());
     }
   }
 }
