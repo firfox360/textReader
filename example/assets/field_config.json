@@ -1,0 +1,68 @@
+{
+  "version": "2.0",
+  "fields": [
+    {
+      "id": "name",
+      "content_name": "name||Name||nombre||full name",
+      "type": "String",
+      "regex": "(?:name|full name|full\\s+name|nombre|full_name)\\s*:?\\s*([a-zA-Z\\s\\.]+?)(?=\\n|age|gender|address|phone|email|$)",
+      "caseSensitive": false
+    },
+    {
+      "id": "age",
+      "content_name": "age||Age||edad",
+      "type": "int",
+      "regex": "(?:age|edad)\\s*:?\\s*(\\d+)",
+      "caseSensitive": false
+    },
+    {
+      "id": "gender",
+      "content_name": "gender||Gender||sex||género",
+      "type": "String",
+      "regex": "(?:gender|sex|género)\\s*:?\\s*(male|female|other|m|f|o)",
+      "caseSensitive": false
+    },
+    {
+      "id": "address",
+      "content_name": "address||Address||dirección||location",
+      "type": "String",
+      "regex": "(?:address|dirección|location|addr|add)\\s*:?\\s*([^\\n]+(?:\\n(?!(?:phone|email|age|gender|name|date|dob|id|document))[^\\n]+)*)",
+      "caseSensitive": false
+    },
+    {
+      "id": "phone",
+      "content_name": "phone||Phone||tel||mobile||number||Number",
+      "type": "String",
+      "regex": "(?:phone|tel|teléfono|mobile|number|número)\\s*:?\\s*([a-zA-Z0-9\\+\\s\\(\\)\\-\\.]+?)(?=\\n|email|address|$)",
+      "caseSensitive": false
+    },
+    {
+      "id": "email",
+      "content_name": "email||Email||e-mail",
+      "type": "String",
+      "regex": "(?:email|e-mail|e-address|mail)\\s*:?\\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})",
+      "caseSensitive": false
+    },
+    {
+      "id": "dateOfBirth",
+      "content_name": "dob||DOB||date of birth||birth date||birthday",
+      "type": "String",
+      "regex": "(?:dob|date of birth|date ofbirth|nacimiento|fecha|birth date|birthday|birth_date)\\s*:?\\s*(\\d{1,2}[-\\/\\.]\\d{1,2}[-\\/\\.]\\d{2,4})",
+      "caseSensitive": false
+    },
+    {
+      "id": "documentId",
+      "content_name": "id||ID||document||Document||doc id",
+      "type": "String",
+      "regex": "(?:id|document|doc id|identification|documento|ref|reference|ref no|ref_no|doc_id|id no|id_no)\\s*:?\\s*([a-zA-Z0-9\\-\\.]{4,})",
+      "caseSensitive": false
+    },
+    {
+      "id": "partNo",
+      "content_name": "part-no||part no||part number||Part No||P/N",
+      "type": "String",
+      "regex": "(?:part[\\s\\-]*no\\.?|part[\\s\\-]*number|p\\/n)\\s*:?\\s*([a-zA-Z0-9\\-\\/]+)",
+      "caseSensitive": false
+    }
+  ]
+}

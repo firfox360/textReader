@@ -1,8 +1,11 @@
 name: textreder
-description: "A new Flutter project."
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+description: "A professional Flutter package for OCR-based text extraction and intelligent data parsing. Extract structured information from images using Google ML Kit and automatically populate forms with accurate data."
+# Enable publishing to pub.dev
+publish_to: 'https://pub.dev'
+
+homepage: https://github.com/yourusername/textreder
+repository: https://github.com/yourusername/textreder
+issue_tracker: https://github.com/yourusername/textreder/issues
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +22,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.0
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions

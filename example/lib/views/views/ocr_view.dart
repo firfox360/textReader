@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/ocr_controller.dart';
-import '../config/app_config.dart';
-import '../config/app_theme.dart';
-import '../widgets/custom_widgets.dart';
+
+import '../../config/config/app_config.dart';
+import '../../config/config/app_theme.dart';
+import '../../controllers/controllers/ocr_controller.dart';
+import '../../widgets/widgets/custom_widgets.dart';
 
 /// Main OCR Scanner View - Production level MVC
 class OcrView extends GetView<OcrController> {
@@ -169,7 +170,10 @@ class OcrView extends GetView<OcrController> {
                 child: CustomTextField(
                   label: fieldId,
                   hintText: 'Enter $fieldId',
-                  controller: TextEditingController(text: value.toString()),
+                  controller: controller.formControllers.putIfAbsent(
+                    fieldId,
+                    () => TextEditingController(text: value.toString()),
+                  ),
                   onChanged: (newValue) {
                     controller.updateFieldValue(fieldId, newValue);
                   },
