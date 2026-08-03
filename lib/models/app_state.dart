@@ -8,7 +8,7 @@ class AppState {
   RxBool isProcessing = false.obs;
 
   // Error states
-  RxString? errorMessage = null;
+  RxString? errorMessage;
   RxBool hasError = false.obs;
 
   // Data states

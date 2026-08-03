@@ -15,9 +15,9 @@ class TextrederException implements Exception {
 /// Exception for image processing errors
 class ImageProcessingException extends TextrederException {
   ImageProcessingException(
-    String message, {
-    dynamic originalError,
-  }) : super(message, originalError: originalError);
+    super.message, {
+    super.originalError,
+  });
 
   @override
   String toString() => 'ImageProcessingException: $message';
@@ -26,9 +26,9 @@ class ImageProcessingException extends TextrederException {
 /// Exception for text extraction errors
 class ExtractionException extends TextrederException {
   ExtractionException(
-    String message, {
-    dynamic originalError,
-  }) : super(message, originalError: originalError);
+    super.message, {
+    super.originalError,
+  });
 
   @override
   String toString() => 'ExtractionException: $message';
@@ -37,9 +37,9 @@ class ExtractionException extends TextrederException {
 /// Exception for configuration errors
 class ConfigurationException extends TextrederException {
   ConfigurationException(
-    String message, {
-    dynamic originalError,
-  }) : super(message, originalError: originalError);
+    super.message, {
+    super.originalError,
+  });
 
   @override
   String toString() => 'ConfigurationException: $message';

@@ -33,19 +33,17 @@ class ImageProcessingException extends AppException {
 }
 
 class TextRecognitionException extends AppException {
-  TextRecognitionException(String message, {dynamic originalError})
+  TextRecognitionException(String message, {super.originalError})
       : super(
           message: message,
           code: 'TEXT_RECOGNITION_ERROR',
-          originalError: originalError,
         );
 }
 
 class DataExtractionException extends AppException {
-  DataExtractionException(String message, {dynamic originalError})
+  DataExtractionException(String message, {super.originalError})
       : super(
           message: message,
           code: 'DATA_EXTRACTION_ERROR',
-          originalError: originalError,
         );
 }

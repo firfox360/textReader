@@ -1,16 +1,14 @@
 import 'package:flutter/foundation.dart';
 import '../models/field_config.dart';
-import '../exceptions/textreder_exceptions.dart';
 
 /// Extracts structured data from text using regex patterns
-/// Returns Map<String, dynamic> with field IDs as keys
+
 class TextExtractor {
   final List<FieldConfig> fieldConfigs;
 
   TextExtractor({required this.fieldConfigs});
 
   /// Extract all fields from raw text
-  /// Returns Map<fieldId, extractedValue>
   /// Example output:
   /// {
   ///   'name': 'John Doe',
