@@ -1,11 +1,10 @@
-name: textreder
+name: text_reader
 description: >
   A powerful Flutter package for extracting structured data from document images
   using OCR and regex-based field extraction. Configure fields via JSON and get
   results as Map<String, dynamic> with automatic type conversion.
 
 version: 1.0.0
-publish_to: none
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -22,9 +21,9 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
 
-repository: https://github.com/yourusername/textreder
-homepage: https://github.com/yourusername/textreder
-documentation: https://pub.dev/packages/textreder
+repository: https://github.com/firfox360/textReader
+homepage: https://github.com/firfox360/textReader
+documentation: https://pub.dev/packages/text_reader
 
 topics:
   - ocr

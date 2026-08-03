@@ -1,5 +1,5 @@
-name: textreder_example
-description: Example app demonstrating the TextReder package for OCR document extraction.
+name: text_reader_example
+description: Example app demonstrating the TextReader package for OCR document extraction.
 
 version: 1.0.0+1
 
